@@ -41,7 +41,7 @@ install_mongo() {
 	echo "deb [ arch=amd64,arm64 ] https://repo.mongodb.org/apt/ubuntu ${CODENAME}/mongodb-org/4.4 multiverse" | sudo tee /etc/apt/sources.list.d/mongodb-org-4.4.list
 
 	sudo apt update
-	sudo apt install -y mongodb-org
+	sudo apt install -y mongodb-org=4.4.8 mongodb-org-server=4.4.8 mongodb-org-shell=4.4.8 mongodb-org-mongos=4.4.8 mongodb-org-tools=4.4.8
 
 	# Optional: don't auto update:
 	#echo "mongodb-org hold" | sudo dpkg --set-selections
