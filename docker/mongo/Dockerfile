@@ -23,6 +23,4 @@ EXPOSE $PORT
 
 VOLUME /data/db
 
-COPY entrypoint.sh /tmp/entrypoint.sh
-
 ENTRYPOINT mongod --bind_ip_all --port $PORT
