@@ -2,6 +2,32 @@
 
 This repository maintains scripts to install your own instance of Crownstone cloud on a local machine such as a Raspberry Pi (3/4/400).
 
+Two ways to install: using Docker and using an install script.
+
+## Install using Docker
+
+Start using the exmple docker-compose:
+```
+git clone https://github.com/Crownstone-Community/cloud-installer.git
+cd cloud-installer
+git checkout $(git describe --tags `git rev-list --tags --max-count=1`)
+cd docker
+docker-compose up
+```
+Then view log of crownstone-cloud to see generated encryption keys.
+Update the environment variables accordingly.
+
+An example docker-compose file is included.
+You can view all possible settings using environment variables in the dockerfiles.
+
+For generating encryption keys, start crownstone-cloud with empty environment variables.
+The new generated tokens will be shown in the log.
+
+The ARM image has no support for the init-script.
+For x64, change `mongo/mongo-init.js` before using the database as it will only run when the database is empty.
+
+## Install using install script
+
 The scripts install the complete Crownstone cloud, and updates it as well.
 
 The Crownstone cloud uses MongoDB to store data. This script can install MongoDB as well. However, authorization will not be set up, though it will not be accessible via network.
@@ -23,7 +49,7 @@ The Crownstone cloud consists of:
   - Nothing yet.
 
 
-## Security
+### Security
 
 As with every server, you should make sure to keep the system up to date and reduce the attack surface.
 Security is not set up by this installer script, you will have to do this yourself.
@@ -35,7 +61,7 @@ Think about:
 - Installing (and configuring) *fail2ban*.
 - Etc.
 
-## Requirements
+### Requirements
 
 Most requirements come from the installation of [MongoDB](https://www.mongodb.com/docs/v4.4/administration/production-notes). When installing on a Raspberry Pi, ensure to use the 64-bit OS, as MongoDB requires an 64-bit OS. In case you want to install MongoDB manually or on another location, you can skip installing MongoDB during the installation process. This may require you to change the environment variables after installation (see below), but it allows you to run this installer on a user without sudo rights, and configure authentication on MongoDB.
 
@@ -47,14 +73,13 @@ The installation has been tested on a Raspberry Pi 4 with Raspberry Pi OS Lite 6
 sudo rpi-imager
 ```
 
-
-## Preparation
+### Preparation
 
 In the middle of the install script you will be asked for keys to be able to send push notifications from your local cloud instance towards the Android or iOS app. These keys can be provided by the maintainers. You can reach the maintainers for these keys at the [Crownstone Community discord server](https://discord.gg/TPYfMvV7bD).
 
 Make sure to configure your server (the Rasperry Pi) to have a static local ip address. Usually this can be done by logging in on your router.
 
-## Installation
+### Installation
 
 During installation of all the tools, there's quite some network traffic. Preferably connect your hub through a wire rather than relying on a spotty WiFi connection.
 
@@ -75,7 +100,7 @@ After that simply run the script (some confirmations may be asked during the ins
 ./install.sh ~/crownstone-cloud
 ```
 
-## Monitoring
+### Monitoring
 
 You can check the status of the various services with:
 
@@ -85,7 +110,7 @@ systemctl --user status cs-*
 
 You can see logs with `journalctl --user`.
 
-## Data import
+### Data import
 
 Every user in your sphere will have to:
 - Get their phone and log out from the Crownstone app (Settings -> Log Out).
@@ -95,7 +120,7 @@ Then, go to your own cloud v2 server [http://123.456.78.9:3050/import-data](http
 
 Now upload the downloaded data. Note that this can take a while, wait until the page changes into "DONE".
 
-## App settings
+### App settings
 
 Every user in your sphere will have to perform this step.
 
@@ -113,14 +138,14 @@ Now click *Validate and save*, and login.
 
 Note: After a preliminary success message you may get a warning pop-up saying that the cloud endpoints are not stored. This is a known bug. As long as the preliminary message reported success, you're all good.
 
-## Environment variables
+### Environment variables
 
 During installation, the environmental variables used to configure the different repositories, are partially copied from template files and partially generated.
 You can find them in `cloud-installer/repos`. For example `cloud-installer/repos/cloud-v2/environment-variables.sh`.
 
 If you need to update these, for example when you manualy installed MongoDB, you will have to restart the service afterwards. For example: `systemctl --user restart cs-cloud-v2`.
 
-## Resolving problems
+### Resolving problems
 
 Various problems can and have been encountered.
 

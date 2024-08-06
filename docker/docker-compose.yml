@@ -1,0 +1,69 @@
+services:
+  # Enables sending events to clients.
+  crownstone-sse-server:
+    build: ./crownstone-sse-server
+    hostname: crownstone-sse-server
+    env_file: crownstone.env
+    ports:
+      - 8000:8000
+    environment:
+      BASE_URL: crownstone-sse-server   # Used only for a log.
+
+  # Handles login, and REST API calls.
+  crownstone-cloud:
+    build: ./crownstone-cloud
+    hostname: crownstone-cloud
+    env_file: crownstone.env
+    ports:
+      - 3000:3000
+    environment:
+      BASE_URL: crownstone-cloud.local   # External url, used in e-mails
+      CROWNSTONE_USER_ADMIN_KEY: ""
+      # Other settings.
+      EMAIL_VERIFICATION_REQUIRED: "true"
+      # Config variables for email validation, when enabled these should be filled in.
+      # Only MAIL_USER and MAIL_PASSWORD are needed when using gmail.
+      MAIL_SECURE: "true"
+      #MAIL_TLS_REJECTUNAUTHORIZED: "false"  # Use false for self-signed certificates, or certificates from Let's Encrypt
+      MAIL_ADDRESS: smtp.gmail.com
+      MAIL_PORT: 465
+      MAIL_USER: gmail-user
+      MAIL_PASSWORD: gmail-password
+
+  # Handles new REST API calls, export and import of data.
+  crownstone-cloud-v2:
+    build: ./cloud-v2
+    hostname: crownstone-cloud-v2
+    env_file: crownstone.env
+    ports:
+      - 3050:3050
+    
+  # Enables sending updates to third parties (Google Home, Alexa, etc).
+  crownstone-webhooks:
+    build: ./crownstone-webhooks
+    hostname: crownstone-webhooks
+    env_file: crownstone.env
+    ports:
+      - 3100:3100
+    environment:
+      BASE_URL: localhost   # Used only for a log.
+
+  # Cleans up the database.
+  crownstone-cron:
+    build: ./crownstone-cron
+    hostname: crownstone-cron
+    env_file: crownstone.env
+
+  mongo:
+    image: mongo:4.4  # For x64
+    # build: ./mongo    # For ARM
+    hostname: mongo-crownstone
+    # environment:
+    #   MONGO_INITDB_DATABASE: "data_v1"
+    volumes:
+      - crownstone-mongo:/data/db
+      # For push notifications (optional)
+      #- ./mongo/mongo-init.js:/docker-entrypoint-initdb.d/mongo-init.js
+
+volumes:
+  crownstone-mongo:
